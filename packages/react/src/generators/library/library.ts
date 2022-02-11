@@ -41,6 +41,7 @@ import {
 import componentGenerator from '../component/component';
 import init from '../init/init';
 import { Schema } from './schema';
+import { cypressComponentProject } from '@nrwl/cypress/src/generators/cypress-component-project/cypress-component-project';
 
 export interface NormalizedSchema extends Schema {
   name: string;
@@ -95,6 +96,14 @@ export async function libraryGenerator(host: Tree, schema: Schema) {
     tasks.push(jestTask);
   }
 
+  if (options.addCypressComponentTest) {
+    const cypressTask = await cypressComponentProject(host, {
+      project: options.name,
+      componentType: 'react',
+    });
+    tasks.push(cypressTask);
+  }
+
   if (options.component) {
     const componentTask = await componentGenerator(host, {
       name: options.name,
@@ -106,6 +115,7 @@ export async function libraryGenerator(host: Tree, schema: Schema) {
       routing: options.routing,
       js: options.js,
       pascalCaseFiles: options.pascalCaseFiles,
+      addCypressComponentTest: options.addCypressComponentTest,
     });
     tasks.push(componentTask);
   }

@@ -11,6 +11,7 @@ import { inspect } from 'util';
 import { basename, dirname, extname } from 'path';
 import { tsquery } from '@phenomnomnominal/tsquery';
 import { StringLiteral } from 'typescript';
+import { CypressExecutorOptions } from '../../executors/cypress/cypress.impl';
 
 export function updateProject(tree: Tree, options: CypressConvertOptions) {
   const projectConfig = readProjectConfiguration(tree, options.project);
@@ -50,6 +51,7 @@ export default defineConfig(${inspect(cypressConfigs.cypressConfigTs)})
     projectConfig.targets[target].options = {
       ...projectConfig.targets[target].options,
       cypressConfig: cypressConfigPathTs,
+      testingType: 'e2e',
     };
   }
 

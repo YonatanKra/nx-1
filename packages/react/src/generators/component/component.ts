@@ -17,11 +17,13 @@ import {
   joinPathFragments,
   logger,
   names,
+  readProjectConfiguration,
   toJS,
   Tree,
 } from '@nrwl/devkit';
 import { runTasksInSerial } from '@nrwl/workspace/src/utilities/run-tasks-in-serial';
 import { addImport } from '../../utils/ast-utils';
+import { cypressComponentProject } from '@nrwl/cypress/src/generators/cypress-component-project/cypress-component-project';
 
 interface NormalizedSchema extends Schema {
   projectSourceRoot: string;
@@ -34,6 +36,8 @@ interface NormalizedSchema extends Schema {
 export async function componentGenerator(host: Tree, schema: Schema) {
   const options = await normalizeOptions(host, schema);
   createComponentFiles(host, options);
+
+  const projectConfiguration = readProjectConfiguration(host, schema.project);
 
   const tasks: GeneratorCallback[] = [];
 
@@ -49,6 +53,17 @@ export async function componentGenerator(host: Tree, schema: Schema) {
       { '@types/react-router-dom': typesReactRouterDomVersion }
     );
     tasks.push(routingTask);
+  }
+
+  if (
+    options.addCypressComponentTest &&
+    !projectConfiguration.targets['test-cmp']
+  ) {
+    const cypressTask = await cypressComponentProject(host, {
+      project: options.project,
+      componentType: 'react',
+    });
+    tasks.push(cypressTask);
   }
 
   await formatFiles(host);
@@ -71,6 +86,10 @@ function createComponentFiles(host: Tree, options: NormalizedSchema) {
     let deleteFile = false;
 
     if (options.skipTests && /.*spec.tsx/.test(c.path)) {
+      deleteFile = true;
+    }
+
+    if (!options.addCypressComponentTest && /.*cy.tsx/.test(c.path)) {
       deleteFile = true;
     }
 
@@ -166,6 +185,7 @@ async function normalizeOptions(
   options.classComponent = options.classComponent ?? false;
   options.routing = options.routing ?? false;
   options.globalCss = options.globalCss ?? false;
+  options.addCypressComponentTest = options.addCypressComponentTest ?? false;
 
   return {
     ...options,

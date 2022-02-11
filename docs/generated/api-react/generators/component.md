@@ -61,6 +61,14 @@ Type: `string`
 
 The name of the project.
 
+### addCypressComponentTest
+
+Default: `false`
+
+Type: `boolean`
+
+Add a Cypress component test https://cypress.io
+
 ### classComponent
 
 Alias(es): C

@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "NxCypressComponentProject",
+  "cli": "nx",
+  "title": "Set up Cypress component test for a project",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project to convert",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "componentType": {
+      "type": "string",
+      "enum": ["react"],
+      "description": "which framework is being used?"
+    }
+  },
+  "required": ["project", "componentType"]
+}
